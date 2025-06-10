@@ -89,9 +89,11 @@ class HealthcareForm {
             card.classList.remove('selected');
         }
         
-        // Update form data
+        // Update form data immediately when checkboxes change
         const checkedBoxes = Array.from(document.querySelectorAll('input[name="Care-Needs"]:checked'));
         this.formData.careNeeds = checkedBoxes.map(cb => cb.value);
+        
+        console.log('Care needs updated:', this.formData.careNeeds);
     }
     
     handleInputChange(e) {
@@ -156,7 +158,9 @@ class HealthcareForm {
                 }
                 break;
             case 2:
-                isValid = this.formData.careNeeds && this.formData.careNeeds.length > 0;
+                // Check if at least one care need is selected
+                const checkedBoxes = Array.from(document.querySelectorAll('input[name="Care-Needs"]:checked'));
+                isValid = checkedBoxes.length > 0;
                 if (!isValid) {
                     console.log('Step 2 validation failed: No care needs selected');
                 }
@@ -287,7 +291,18 @@ class HealthcareForm {
             font-size: 14px;
             border: 1px solid #fecaca;
         `;
-        message.textContent = 'Please complete all required fields before continuing.';
+        
+        // Customize message based on current step
+        let messageText = 'Please complete all required fields before continuing.';
+        if (this.currentStep === 1) {
+            messageText = 'Please select a care type before continuing.';
+        } else if (this.currentStep === 2) {
+            messageText = 'Please select at least one care need before continuing.';
+        } else if (this.currentStep === 4) {
+            messageText = 'Please select when you need care to start.';
+        }
+        
+        message.textContent = messageText;
         
         const stepContent = document.querySelector(`[data-step="${this.currentStep}"] .step-content`);
         stepContent.appendChild(message);
