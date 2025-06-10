@@ -90,7 +90,7 @@ class HealthcareForm {
         }
         
         // Update form data
-        const checkedBoxes = Array.from(document.querySelectorAll('input[name="care_needs"]:checked'));
+        const checkedBoxes = Array.from(document.querySelectorAll('input[name="Care-Needs"]:checked'));
         this.formData.careNeeds = checkedBoxes.map(cb => cb.value);
     }
     
@@ -315,15 +315,21 @@ class HealthcareForm {
             const formElement = document.getElementById('healthcare-form');
             const formData = new FormData(formElement);
             
-            // Add selected care needs
+            // Add selected care needs as individual entries for Webflow
             if (this.formData.careNeeds) {
-                formData.delete('care_needs'); // Remove existing entries
                 this.formData.careNeeds.forEach(need => {
-                    formData.append('care_needs[]', need);
+                    formData.append('Care-Needs', need);
                 });
             }
             
-            // Simulate API call
+            // For Webflow compatibility, try native form submission first
+            if (typeof window !== 'undefined' && window.Webflow) {
+                // Let Webflow handle the form submission
+                formElement.submit();
+                return;
+            }
+            
+            // Fallback: Simulate API call for testing
             await this.simulateApiCall(formData);
             
             // Show success message
